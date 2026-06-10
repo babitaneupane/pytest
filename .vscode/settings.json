@@ -1,4 +1,7 @@
 {
+    "python.analysis.extraPaths": [
+        "./pageobjects"
+    ],
     "editor.fontSize": 14,
     "workbench.iconTheme": "vscode-icons"
 }
