@@ -4,7 +4,7 @@ from playwright.sync_api import  expect
 fakePayloadOrderResponse = {"data": [], "message": "No Orders"}
 
 def interceptRequest(route):
-    route.continue_(url=" ")
+    route.continue_(url="https://rahulshettyacademy.com/client")
 
 
 def test_Network_2(page):

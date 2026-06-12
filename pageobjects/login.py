@@ -13,7 +13,7 @@ class LoginPage:
 
     def login(self,userEmail,userpassword):
      self.page.get_by_placeholder("email@example.com").fill(userEmail)
-     self.page.get_by_placeholder("enter your password").fill(userpassword)
+     self.page.get_by_placeholder("enter your passsword").fill(userpassword)
      self.page.get_by_role("button",name="Login").click()
      dashboardpage = Dashboardpage(self.page)
      return dashboardpage

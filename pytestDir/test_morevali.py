@@ -18,15 +18,10 @@ def test_UIChecks(page: Page):
     time.sleep(4)
 
 
-
    #mousehover
     page.locator("#mousehover").hover()
     page.get_by_role("link", name="top").click()
     
-
-
-
-
 
     #framehandling
     pageframe= page.frame_locator("#courses-iframe")

@@ -1,9 +1,13 @@
 import pytest
 import json
+import requests
 
 from playwright.sync_api import Playwright, expect
 from pageobjects.login import LoginPage
 from pageobjects.dashboard import Dashboardpage
+from utils.apiBaseFramework import APIUtils
+
+BASE_URL = "https://rahulshettyacademy.com"
 
 # Load credentials for parametrization
 def load_credentials():
@@ -16,16 +20,13 @@ user_credentials_list = load_credentials()
 
 class APIUtils:
 
-    def getToken(self, playwright, user_credentials):
+
+    def getToken(self, user_credentials):
         user_email = user_credentials["userEmail"]
         user_password = user_credentials["userPassword"]
 
-        api_request_context = playwright.request.new_context(
-            base_url="https://rahulshettyacademy.com"
-        )
-
-        response = api_request_context.post(
-            "/api/ecom/auth/login",
+        response = requests.post(
+            f"{BASE_URL}/api/ecom/auth/login",
             data={
                 "userEmail": user_email,
                 "userPassword": user_password,
@@ -35,25 +36,21 @@ class APIUtils:
         print(response.json())
         return response.json().get("token")
 
-    def create_order(self, playwright, user_credentials, orders_payload):
-        token = self.getToken(playwright, user_credentials)
+    def create_order(self, user_credentials, orders_payload):
+        token = self.getToken(user_credentials)
 
-        api_request_context = playwright.request.new_context(
-            base_url="https://rahulshettyacademy.com"
-        )
-
-        response = api_request_context.post(
-            "/api/ecom/order/create-order",
+        response = requests.post(
+            f"{BASE_URL}/api/ecom/order/create-order",
             data=json.dumps(orders_payload),
             headers={
-                "Authorization": f"Bearer {token}",
+                "Authorization": token,
                 "Content-Type": "application/json",
             },
         )
 
         responseBody = response.json()
         print(responseBody)
-        return responseBody.get("orders", [{}])[0].get("_id")
+        return responseBody.get("orders")[0]
 
 
 @pytest.mark.parametrize('user_credentials', user_credentials_list)
@@ -63,19 +60,18 @@ def test_e2e_web_api(playwright, page, user_credentials):
     password = user_credentials["userPassword"]
 
     # Define the order payload
-    orders_payload = {
-        "orders": [
-            {
+    orders_payload = [
+         {
                 "country": "India",
-                "productOrderedId": "6581ca979fd99c85e8ee7faf"
+                "productOrderedId": "6960eae1c941646b7a8b3ed3"
             }
-        ]
-    }
+    ]
+           
+        
 
     # Create order via API
     api_utils = APIUtils()
     orderId = api_utils.create_order(
-        playwright,
         user_credentials,
         orders_payload,
     )
@@ -97,8 +93,6 @@ def test_e2e_web_api(playwright, page, user_credentials):
 
     # Verify success message
     success_element = page.locator(".tagline")
-    expect(success_element).to_contain_text("Thankyou for choosing us")
+    expect(success_element).to_contain_text("Thank you for Shopping With Us")
 
     print("[SUCCESS] Test passed! Found thank you message")
-       
-      
